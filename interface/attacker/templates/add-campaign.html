@@ -1,0 +1,890 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attack | Email Phishing</title>
+    <!-- Bootstrap CSS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #161616;
+            font-family: Arial, sans-serif;
+        }
+
+
+
+        .card-custom {
+            background-color: #222;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .btn-custom {
+            background-color: #0b3a3e;
+            border: none;
+            color: white;
+        }
+
+        .btn-custom:hover {
+            background-color: #042a2f;
+            color: white;
+        }
+
+        .clicked-links {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        .clicked-links li {
+            margin-bottom: 5px;
+        }
+
+        .recipient-info label {
+            color: white;
+        }
+
+        .recipient-info {
+            background-color: #222;
+            border: 1px solid #444;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .recipient-info h3 {
+            color: #4CAF50;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+        }
+
+        .recipient-info p {
+            margin-bottom: 8px;
+        }
+
+        .recipient-info h4 {
+            color: #2196F3;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        .recipient-info ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .recipient-info li {
+            background-color: #333;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .recipient-info a {
+            color: #FFC107;
+            text-decoration: none;
+        }
+
+        .recipient-info a:hover {
+            text-decoration: underline;
+        }
+
+        .device-type {
+            font-weight: bold;
+            color: #FFC107;
+        }
+
+        .template {
+            max-height: 400px;
+            background-color: #07292d;
+            margin: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: rgb(74, 255, 38);
+        }
+
+        .template:hover {
+            background-color: #0b3a3e;
+        }
+
+
+
+        .card-custom h2,
+        .card-custom h3,
+        .card-custom h5 {
+            color: #ffffff;
+        }
+
+        .form-group label {
+            font-weight: bold;
+        }
+
+        .form-control {
+            border-radius: 5px;
+            border: 1px solid #ffffff;
+        }
+
+        .form-control:focus {
+            border-color: #040909;
+            box-shadow: 0 0 5px rgba(2, 39, 42, 0.5);
+        }
+
+        .form-container {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .template-options {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .btn-custom {
+            background-color: #0b3a3e;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .btn-custom:hover {
+            background-color: #042a2f;
+        }
+
+        @media (max-width: 576px) {
+            .card-custom {
+                margin: 0;
+                width: 100%;
+            }
+        }
+
+        .img-fluid {
+            width: 100%;
+            height: 100%;
+            object-fit: cover !important;
+        }
+
+        .img-fluid-contain {
+            width: 100%;
+            height: 100%;
+            object-fit: contain !important;
+        }
+
+        /* Container for notifications */
+        #notification-container {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            /* Gap between notifications */
+        }
+
+        /* Common styles for notifications */
+        .notification {
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: #fff;
+            min-width: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            opacity: 0.9;
+
+            /* Smooth transition for max-height, opacity, and transform */
+            max-height: 100px;
+            /* Large enough to cover content */
+            overflow: hidden;
+            opacity: 1;
+            height: 40px;
+            transform: translateX(0);
+            transition: max-height 0.5s ease, opacity 0.3s ease, height 0.5s ease, transform 0.5s ease, margin 0.5s ease;
+        }
+
+        .notification.slidingOut {
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+
+        .notification span {
+            font-size: 14px;
+            transition: font-size 0.5s ease;
+        }
+
+        .notification.collapsing span {
+            font-size: 0;
+        }
+
+        /* Collapsed state */
+        .notification.collapsing {
+            max-height: 0;
+            height: 0;
+            margin: 0;
+        }
+
+        /* Color types for notifications */
+        .notification.success {
+            background-color: hsla(120, 100%, 50%, 0.5);
+        }
+
+        .notification.warning {
+            background-color: hsla(36, 100%, 50%, 0.5);
+        }
+
+        .notification.danger {
+            background-color: hsla(36, 100%, 50%, 0.5);
+        }
+
+        .notification.info {
+            background-color: hsla(210, 100%, 50%, 0.5);
+        }
+
+        /* Slide-in animation */
+        @keyframes slideIn {
+            0% {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .collapse-link {
+            text-decoration: none;
+            font-size: 14px;
+            color: #007bff;
+        }
+
+        .collapse-link:hover {
+            text-decoration: underline;
+        }
+
+        .template-name {
+            color: white;
+        }
+
+        .template-name:hover {
+            color: rgb(10, 255, 10);
+        }
+
+        #custom-template-options div{
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Add this at the top of your <body> or wherever you want the loader to appear -->
+    <div id="loader"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); z-index: 9999;">
+        <div
+            style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white;">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p>Sending email... Please wait.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card card-custom p-4 shadow-sm recipient-info">
+            <div id="screen1" class="form-container">
+                <h3 class="text-center mb-4">General Information</h3>
+                <div class="form-group pb-3">
+                    <label for="campaign_name">Campaign Name:</label>
+                    <input type="text" class="form-control" id="campaign_name" placeholder="Enter campaign name">
+                </div>
+                <div class="form-group mb-3">
+                    <label for="optionSelect">Select Option:</label>
+                    <select class="form-select" id="optionSelect">
+                        <option value="">Select</option>
+                        <option value="one">Spear Phishing</option>
+                        <option value="two">Bulk Phishing</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="screen2" class="form-container">
+                <h3 class="text-center mb-4">Select a Template</h3>
+                <div class="form-group mb-3">
+                    <h4>Custom Templates</h4>
+                    <div class="row" id="custom-template-options">
+                        <div class="col-md-3">
+                            <div class="template" onclick="openNewTemplateOption()">
+                                + Blank
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="template" onclick="openScrapeModel()">
+                                + Scrape
+                            </div>
+                        </div>
+
+
+
+                        <div class="modal" tabindex="-1" id="scrapeModel" data-bs-theme="dark">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Scrape URL</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <label for="urlInput">URL</label>
+                                        <input type="url" class="form-control" id="urlInput"
+                                            placeholder="Copy URL here">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Cancel</button>
+                                        <button type="button" onclick="scrapeUrl()"
+                                            class="btn btn-primary">Scrape</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <script>
+
+                            function openScrapeModel() {
+                                $('#scrapeModel').modal('show');
+                            }
+
+                            function openNewTemplateOption() {
+                                window.location.href = `{% url 'create_custom_template' %}`
+                            }
+
+                            function scrapeUrl() {
+                                const urlToScrape = $('#urlInput').val();
+                                if (urlToScrape) {
+                                    const encodedUrl = encodeURIComponent(urlToScrape);  // Encode the URL to handle special characters
+                                    const scrapeUrl = `{% url 'scrape_url' %}?scrape=${encodedUrl}`;
+                                    window.open(scrapeUrl, '_blank');
+                                } else {
+                                    Notify("Please enter a URL to scrape", "warning");
+                                }
+                            }
+
+                            function openCustomTemplateOption() {
+                                $('#customTemplateOptionModal').modal('show');
+                            }
+                        </script>
+                        {% for custom_template in custom_templates %}
+                        <div class="col-md-3">
+                            <div class="template" onclick="continueWithCustomTemplate(this)">
+                                <span class="template-id" style="display: none; opacity: 0; visibility: hidden;"
+                                    hidden>{{ custom_template.id }}</span>
+                                <span class="text-center template-name">{{ custom_template.name }}</span>
+                              
+                                <!-- {% if custom_template.thumbnail %}
+                                    <img src="{{ custom_template.thumbnail }}" class="template-image img-fluid"
+                                        alt="Thumbnail for {{ custom_template.name }}" width="200">
+                                    {% else %}
+                                    <img src="{% static 'images/1.jpg' %}" class="img-fluid template-image"
+                                        alt="Default Thumbnail" width="200">
+                                    {% endif %} -->
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                    <h4>Templates</h4>
+                    <div class="row" id="template-options">
+                        {% for template in templates %}
+                        <div class="col-md-3">
+                            <div class="template" onclick="openModal(this)">
+                                <span class="text-center template-name">{{ template.name }}</span>
+                                <span class="template-id" style="display: none; opacity: 0; visibility: hidden;"
+                                    hidden>{{ template.id }}</span>
+                                <iframe hidden style="display: none;" frameborder="0"
+                                    srcdoc="{{ template.html_content }}"></iframe>
+
+                                {% if template.thumbnail %}
+                                <img src="{{ template.thumbnail }}" class="template-image img-fluid"
+                                    alt="Thumbnail for {{ template.name }}" width="200">
+                                {% else %}
+                                <img src="{% static 'images/1.jpg' %}" class="img-fluid template-image"
+                                    alt="Default Thumbnail" width="200">
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div id="screen3" class="form-container">
+                <h3 class="text-center mb-4">Email Details</h3>
+                <div class="form-group pb-3">
+                    <label for="from">From :</label>
+                    <input type="email" class="form-control" id="from" placeholder="Enter sender email">
+                </div>
+                <div class="form-group pb-3">
+                    <label for="recipientEmail">To :</label>
+                    <input type="email" class="form-control" id="recipientEmail" placeholder="Enter recipient email">
+                </div>
+
+                <!-- CC Input Field -->
+                <div class="form-group pb-3 collapse" id="ccContainer">
+                    <label for="cc">CC:</label>
+                    <input type="email" class="form-control" id="cc" placeholder="Enter CC email">
+                </div>
+
+                <!-- BCC Input Field -->
+                <div class="form-group pb-3 collapse" id="bccContainer">
+                    <label for="bcc">BCC:</label>
+                    <input type="email" class="form-control" id="bcc" placeholder="Enter BCC email">
+                </div>
+                <div class="d-flex" style="justify-content: flex-end; width: 100%; gap: 10px;">
+                    <a href="#" class="collapse-link" data-bs-toggle="collapse" data-bs-target="#ccContainer"
+                        aria-expanded="false" aria-controls="ccContainer" id="ccToggle">
+                        +CC
+                    </a>
+                    <a href="#" class="collapse-link" data-bs-toggle="collapse" data-bs-target="#bccContainer"
+                        aria-expanded="false" aria-controls="bccContainer" id="bccToggle">
+                        +BCC
+                    </a>
+                </div>
+
+                <div class="form-group pb-3">
+                    <label for="subject">Subject:</label>
+                    <input type="text" class="form-control" id="subject" placeholder="Enter subject">
+                </div>
+                <div class="form-group pb-3" id="trackingOptionContainer" style="display: none;">
+                    <label>What to track? :</label>
+                    <select class="form-select" multiple style="display: none;" id="trackingOption">
+                        <option selected value="ip">Track IP Address</option>
+                        <option selected value="device">Track Device</option>
+                        <option selected value="browser">Track Browser</option>
+                        <option selected value="os">Track OS</option>
+                        <option selected value="open">Track after opening</option>
+                        <option selected value="click">Track when clicked on link</option>
+                    </select>
+                </div>
+                <!-- Add this in your form, probably in screen3 -->
+                <div class="form-group pb-3">
+                    <label for="attachment">Attachment:</label>
+                    <input type="file" class="form-control" id="attachment">
+                    <small class="form-text text-muted">Or enter a URL for the attachment</small>
+                    <input type="url" class="form-control mt-2" id="attachmentLink"
+                        placeholder="https://example.com/file.pdf">
+                </div>
+
+                <div class="mb-3">
+                    <button class="btn-custom" onclick="openEditTemplate()">Edit
+                        Template</button>
+                </div>
+
+                <!-- Add this to your form, probably in screen3 -->
+                <div class="form-group pb-3">
+                    <label for="scheduledTime">Schedule Time:</label>
+                    <input type="datetime-local" class="form-control" id="scheduledTime">
+                </div>
+                <div class="form-group pb-3">
+                    <label for="isRecurring">Recurring Campaign:</label>
+                    <input type="checkbox" id="isRecurring">
+                </div>
+                <div class="form-group pb-3" id="recurrencePatternGroup" style="display: none;">
+                    <label for="recurrencePattern">Recurrence Pattern:</label>
+                    <select class="form-select" id="recurrencePattern">
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                    </select>
+                </div>
+                <div class="form-group pb-3" id="recurrenceIntervalGroup" style="display: none;">
+                    <label for="recurrenceInterval">Recurrence Interval:</label>
+                    <input type="number" class="form-control" id="recurrenceInterval" min="1" value="1">
+                </div>
+                <!-- Add this after the recurrence pattern select -->
+                <div class="form-group pb-3" id="recurrenceCountGroup" style="display: none;">
+                    <label for="recurrenceCount">Recurrence Count:</label>
+                    <input type="number" class="form-control" id="recurrenceCount" min="0" value="0">
+                    <small class="form-text text-muted">0 means infinite</small>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4" style="flex-direction: row-reverse;">
+                <button class="btn-custom" id="continueButton" onclick="sendEmail()">Continue</button>
+                <button class="btn-custom" id="backButton" onclick="navigate(-1)" style="display: none;">Back</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="customTemplateOptionModal" tabindex="-1" role="dialog"
+        aria-labelledby="customTemplateOptionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span>Add Custom Template</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="url" class="form-control" id="urlToSrape" placeholder="Enter URL to scrape">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" onclick="openNewTemplateOption()">Blank</button>
+                    <button type="button" class="btn btn-primary" onclick="openScrapeTemplateOption()">Scraped</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="modal fade" id="templateModal" tabindex="-1" role="dialog" aria-labelledby="templateModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span id="templateId" hidden style="display: none; opacity: 0; visibility: hidden;"></span>
+                    <h5 class="modal-title" id="templateModalLabel"><span id="templateName"></span> | Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body"
+                    style="height: 70vh; width: 100%; display: flex; justify-content: center; align-items: center;"
+                    id="templateContent">
+                    <!-- Template content will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary"
+                        onclick="handleTemplateSelection(true)">Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification-container"></div>
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+
+        function continueWithCustomTemplate(element) {
+            const name = element.querySelector('.template-name').textContent;
+            const id = element.querySelector('.template-id').textContent;
+            document.getElementById('template-options').setAttribute("data-selected", name);
+            document.getElementById('template-options').setAttribute("data-selected-id", id);
+            sendEmail();
+        }
+
+        function openEditTemplate() {
+            var templateName = document.getElementById('template-options').getAttribute("data-selected");
+            var template_id = document.getElementById('template-options').getAttribute("data-selected-id");
+            window.open(`/edit-template/${template_id}/`, '_blank');
+        }
+
+        document.getElementById('ccContainer').addEventListener('shown.bs.collapse', function () {
+            document.getElementById('ccToggle').textContent = '-CC';
+        });
+
+        document.getElementById('ccContainer').addEventListener('hidden.bs.collapse', function () {
+            document.getElementById('ccToggle').textContent = '+CC';
+        });
+
+        document.getElementById('bccContainer').addEventListener('shown.bs.collapse', function () {
+            document.getElementById('bccToggle').textContent = '-BCC';
+        });
+
+        document.getElementById('bccContainer').addEventListener('hidden.bs.collapse', function () {
+            document.getElementById('bccToggle').textContent = '+BCC';
+        });
+
+        function Notify(content, type) {
+            const container = document.getElementById('notification-container');
+
+            // Create a new notification element
+            const notification = document.createElement('div');
+            notification.classList.add('notification', type);
+            notification.innerHTML = `<span>${content}</span>`;
+
+            // Add slide-in animation on creation
+            notification.style.animation = 'slideIn 0.3s ease-out';
+
+            // Add notification to the container
+            container.appendChild(notification);
+
+            // Remove notification after 2 seconds
+            setTimeout(() => {
+                // Add 'collapsing' class to initiate the collapse
+                notification.classList.add('slidingOut');
+
+                // Remove the element after the collapse transition finishes
+                setTimeout(() => {
+                    notification.classList.add('collapsing');
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 500); // Match this time with max-height/margin transition duration
+                }, 500); // Match this time with max-height/margin transition duration
+            }, 3000);
+        }
+
+
+
+        window.openModal = function (element) {
+            const templateName = element.querySelector('.template-name').textContent;
+            const templateImage = element.querySelector('.template-image').src;
+            const htmlContent = element.querySelector('iframe').srcdoc;
+            const templateId = element.querySelector('.template-id').textContent;
+
+            if (templateImage) {
+                document.getElementById('templateContent').innerHTML = '<img src="' + templateImage + '"  class="img-fluid-contain" alt="Template Image">';
+            }
+
+            if (htmlContent) {
+                console.log(htmlContent);
+                document.getElementById('templateContent').innerHTML = htmlContent;
+
+            }
+
+            document.getElementById('templateId').innerHTML = templateId;
+
+            document.getElementById('templateName').innerHTML = templateName;
+
+            $('#templateModal').modal('show');
+        };
+
+        function handleTemplateSelection(continueButton) {
+            if (continueButton) {
+                const name = document.getElementById('templateName').textContent;
+                const id = document.getElementById('templateId').textContent;
+                document.getElementById('template-options').setAttribute("data-selected", name);
+                document.getElementById('template-options').setAttribute("data-selected-id", id);
+                sendEmail();
+            } else {
+                $('#templateModal').modal('hide');
+            }
+        }
+
+        let currentScreen = 1;
+        const totalScreens = 3;
+
+        // Show the first screen on initial load
+        document.getElementById(`screen${currentScreen}`).style.display = "block";
+
+        function navigate(direction) {
+            // Hide the current screen
+            document.getElementById(`screen${currentScreen}`).style.display = "none";
+
+            // Update the current screen based on navigation
+            currentScreen += direction;
+
+            // Show the new current screen
+            document.getElementById(`screen${currentScreen}`).style.display = "block";
+
+            // Show/hide buttons based on current screen
+            document.getElementById("backButton").style.display = currentScreen === 1 ? "none" : "block";
+            document.getElementById("continueButton").textContent = currentScreen === totalScreens ? "Send" : "Continue";
+        }
+
+        function validateFields() {
+            let isValid = true;
+
+            // Check required fields based on current screen
+            if (currentScreen === 1) {
+                const option = document.getElementById("optionSelect").value;
+                if (!option) {
+                    isValid = false;
+                    Notify("Please select an option.", "warning");
+                }
+            } else if (currentScreen === 2) {
+                const template = document.getElementById("template-options");
+                const name = template.getAttribute("data-selected");
+
+                if (name === null) {
+                    isValid = false;
+                    Notify("Please select a template.", "warning");
+                }
+                $('#templateModal').modal('hide');
+            } else if (currentScreen === 3) {
+                const email = document.getElementById("recipientEmail").value;
+                const subject = document.getElementById("subject").value;
+                const from = document.getElementById("from").value;
+
+                if (!email) {
+                    isValid = false;
+                    Notify("Please fill in the recipient email.", "warning");
+                }
+                if (!subject) {
+                    isValid = false;
+                    Notify("Please fill in the subject.", "warning");
+                }
+                if (!from) {
+                    isValid = false;
+                    Notify("Please fill in the sender email.", "warning");
+                }
+                if (!bcc) {
+                    isValid = false;
+                    Notify("Please fill in the BCC email.", "warning");
+                }
+            }
+
+            return isValid;
+        }
+
+        function sendEmail() {
+            // Show loader
+
+            if (currentScreen === totalScreens) {
+                document.getElementById('loader').style.display = 'block';
+
+                if (validateFields()) {
+                    const attachmentInput = document.getElementById('attachment');
+                    const attachmentLinkInput = document.getElementById('attachmentLink');
+                    let attachmentPromise = Promise.resolve(null);
+
+                    if (attachmentInput.files.length > 0) {
+                        attachmentPromise = new Promise((resolve) => {
+                            const reader = new FileReader();
+                            reader.onload = (e) => resolve(e.target.result);
+                            reader.readAsDataURL(attachmentInput.files[0]);
+                        });
+                    }
+
+                    attachmentPromise.then((attachmentData) => {
+                        const formData = {
+                            campaign_name: document.getElementById("campaign_name").value,
+                            phishingType: document.getElementById("optionSelect").value,
+                            template: document.getElementById("template-options").getAttribute("data-selected"),
+                            from: document.getElementById("from").value,
+                            to: document.getElementById("recipientEmail").value.split(',').map(email => email.trim()),
+                            cc: document.getElementById("cc").value ? document.getElementById("cc").value.split(',').map(email => email.trim()) : [],
+                            bcc: document.getElementById("bcc").value ? document.getElementById("bcc").value.split(',').map(email => email.trim()) : [],
+                            subject: document.getElementById("subject").value,
+                            trackingOptions: Array.from(document.getElementById("trackingOption").selectedOptions).map(option => option.value),
+                            template_id: document.getElementById("template-options").getAttribute("data-selected-id"),
+                            attachment: attachmentData,
+                            attachment_link: attachmentLinkInput.value,
+                            scheduled_time: document.getElementById('scheduledTime').value,
+                            is_recurring: document.getElementById('isRecurring').checked,
+                            recurrence_pattern: document.getElementById('isRecurring').checked ? document.getElementById('recurrencePattern').value : null,
+                            recurrence_interval: document.getElementById('isRecurring').checked ? parseInt(document.getElementById('recurrenceInterval').value) : 1,
+                            recurrence_count: document.getElementById('isRecurring').checked ? parseInt(document.getElementById('recurrenceCount').value) : 0
+                        };
+
+                        // Send data using fetch API
+                        fetch(`{% url 'send_email' %}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': getCookie('csrftoken')
+                            },
+                            body: JSON.stringify(formData)
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                // Hide loader
+                                document.getElementById('loader').style.display = 'none';
+
+                                if (data.success) {
+                                    document.getElementById('loader').style.display = 'none';
+
+                                    Notify(data.message, "success");
+                                    // Redirect to the campaign page
+                                    window.location.href = data.redirect_url;
+                                } else {
+                                    document.getElementById('loader').style.display = 'none';
+
+                                    Notify('Error: ' + data.error, "error");
+                                }
+                            })
+                            .catch(error => {
+                                // Hide loader
+                                document.getElementById('loader').style.display = 'none';
+                                console.error('Error:', error);
+                                alert('An error occurred while sending the email.');
+                            });
+                    });
+                }
+            } else {
+                if (validateFields()) {
+                    navigate(1); // Go to the next screen if not on the last screen
+                }
+            }
+        }
+
+        // Function to get CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function showTemplateOptions() {
+            const templateSelect = document.getElementById("templateSelect").value;
+            const templateOptions = document.getElementById("templateOptions");
+            const imageOptions = document.getElementById("imageOptions");
+            const videoOptions = document.getElementById("videoOptions");
+            const documentOptions = document.getElementById("documentOptions");
+            const customOptions = document.getElementById("customOptions");
+
+            // Hide all options initially
+            templateOptions.style.display = "none";
+            imageOptions.style.display = "none";
+            videoOptions.style.display = "none";
+            documentOptions.style.display = "none";
+            customOptions.style.display = "none";
+
+            // Show the template options based on the selected template
+            if (templateSelect) {
+                templateOptions.style.display = "block";
+                if (templateSelect === "image") {
+                    imageOptions.style.display = "block";
+                } else if (templateSelect === "video") {
+                    videoOptions.style.display = "block";
+                } else if (templateSelect === "document") {
+                    documentOptions.style.display = "block";
+                } else if (templateSelect === "custom") {
+                    customOptions.style.display = "block";
+                }
+            }
+        }
+
+        document.getElementById('isRecurring').addEventListener('change', function () {
+            document.getElementById('recurrencePatternGroup').style.display = this.checked ? 'block' : 'none';
+            document.getElementById('recurrenceIntervalGroup').style.display = this.checked ? 'block' : 'none';
+            document.getElementById('recurrenceCountGroup').style.display = this.checked ? 'block' : 'none';
+        });
+    </script>
+
+</body>
+
+</html>

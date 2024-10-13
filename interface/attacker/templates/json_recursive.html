@@ -1,0 +1,36 @@
+{% load custom_filters %}
+
+{% for key, value in json_data.items %}
+    <div class="ip-info-section">
+        <h6>{{ key|title }}</h6>
+        {% if value|is_json %}
+            {% for sub_key, sub_value in value.items %}
+                <div class="ip-info-section">
+                    <h6>{{ sub_key|title }}</h6>
+                    {% if sub_value|is_json %}
+                        {% for sub_sub_key, sub_sub_value in sub_value.items %}
+                            <div class="ip-info-item">
+                                <span class="ip-info-key">{{ sub_sub_key|title }}:</span>
+                                {% if sub_sub_value|is_json %}
+                                    <div class="nested-json">
+                                        {% include "json_recursive.html" with json_data=sub_sub_value %}
+                                    </div>
+                                {% else %}
+                                    <span class="ip-info-value">{{ sub_sub_value }}</span>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="ip-info-item">
+                            <span class="ip-info-value">{{ sub_value }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="ip-info-item">
+                <span class="ip-info-value">{{ value }}</span>
+            </div>
+        {% endif %}
+    </div>
+{% endfor %}

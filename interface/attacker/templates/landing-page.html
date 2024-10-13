@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifying...</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .loader-container {
+            text-align: center;
+        }
+
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .message {
+            font-size: 18px;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="loader-container">
+        <div class="loader"></div>
+        <p class="message">Verifying your browser... Please wait.</p>
+    </div>
+
+    <script>
+        // Function to get both IPv4 and IPv6 addresses
+        async function getIPAddresses() {
+            try {
+                const ipv4Response = await fetch('https://api.ipify.org?format=json');
+                const ipv4Data = await ipv4Response.json();
+                const ipv4 = ipv4Data.ip;
+
+                const ipv6Response = await fetch('https://api64.ipify.org?format=json');
+                const ipv6Data = await ipv6Response.json();
+                const ipv6 = ipv6Data.ip;
+
+                console.log('IPv4:', ipv4);
+                console.log('IPv6:', ipv6);
+
+                return { ipv4, ipv6 };
+            } catch (error) {
+                console.error('Error getting IP addresses:', error);
+                return { ipv4: null, ipv6: null };
+            }
+        }
+
+        // Function to send IP data to the server
+        async function sendIPDataToServer(ipv4, ipv6) {
+            const tracking_id = getParameterByName('tracking_id');
+            const link_id = getParameterByName('link_id');
+
+            console.log(tracking_id, link_id, ipv4, ipv6);
+
+            try {
+                const response = await fetch('/update-email-tracking-log/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        tracking_id,
+                        link_id,
+                        ipv4,
+                        ipv6
+                    })
+                });
+
+                const result = await response.json();
+                console.log('Server response:', result);
+                return result.success;
+            } catch (error) {
+                console.error('Error sending IP data to server:', error);
+                return false;
+            }
+        }
+
+        // Function to get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Main function to handle verification and redirection
+        async function handleVerificationAndRedirect() {
+            const { ipv4, ipv6 } = await getIPAddresses();
+            const success = await sendIPDataToServer(ipv4, ipv6);
+
+            if (success) {
+                const originalLink = getParameterByName('redirect');
+                if (originalLink) {
+                    window.location.href = originalLink;
+                } else {
+                    document.querySelector('.message').textContent = 'Verification complete. No redirect URL provided.';
+                }
+            } else {
+                document.querySelector('.message').textContent = 'Verification failed. Please try again later.';
+            }
+        }
+
+        // Function to get parameters from URL
+        function getParameterByName(name, url = window.location.href) {
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+        // Start the process when the page loads
+        window.onload = handleVerificationAndRedirect;
+    </script>
+</body>
+
+</html>

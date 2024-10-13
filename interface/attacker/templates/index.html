@@ -1,0 +1,129 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Phishing</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #161616;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        .card-custom {
+            background-color: #222;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .btn-custom {
+            background-color: #0b3a3e;
+            border: none;
+            color: white;
+        }
+
+        .btn-custom:hover {
+            background-color: #042a2f;
+            color: white;
+        }
+
+        .card-custom {
+            background-color: #222;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        .btn-custom {
+            background-color: #0b3a3e;
+            border: none;
+            color: white;
+        }
+        .btn-custom:hover {
+            background-color: #042a2f;
+            color: white;
+        }
+        .clicked-links {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+        .clicked-links li {
+            margin-bottom: 5px;
+        }
+
+        .recipient-info label{
+            color: white;
+        }
+        .recipient-info {
+            background-color: #222;
+            border: 1px solid #444;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .recipient-info h3 {
+            color: #4CAF50;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+        }
+        .recipient-info p {
+            margin-bottom: 8px;
+        }
+        .recipient-info h4 {
+            color: #2196F3;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+        .recipient-info ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .recipient-info li {
+            background-color: #333;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .recipient-info a {
+            color: #FFC107;
+            text-decoration: none;
+        }
+        .recipient-info a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Campaign List</h1>
+        <div class="text-end mb-3">
+            <a href="{% url 'create_campaign' %}" class="btn btn-custom">Create New Campaign</a>
+        </div>
+        <div class="row">
+            {% for campaign in campaigns %}
+            <div class="col-md-3">
+                <div class="card card-custom">
+                    <div class="card-body " style="color: white;">
+                        <h5 class="card-title" style="color: rgb(140, 223, 89); font-weight: bold;">{{ campaign.name }}
+                        </h5>
+                        <p class="card-text">Campaign ID: {{ campaign.id }}</p>
+                        <p class="card-text">Created at: {{ campaign.created_at_ist|date:"Y-m-d H:i:s" }}</p>
+                        <a href="{% url 'campaign_page' campaign_id=campaign.id %}" class="btn btn-custom">View
+                            Campaign</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-center">No campaigns found.</p>
+            {% endfor %}
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
