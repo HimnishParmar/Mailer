@@ -1,6 +1,17 @@
 @echo off
 echo Current Directory: %cd%
 
+REM Step 0: Check if Python is installed
+python --version >nul 2>&1
+IF %ERRORLEVEL% NEQ 0 (
+    echo Python is not installed. Please install Python from https://www.python.org/downloads/
+    pause
+    exit /b
+) ELSE (
+    echo Python is installed.
+)
+
+
 REM Step 1: Check if virtual environment exists
 IF NOT EXIST ".venv" (
     echo Creating virtual environment...
