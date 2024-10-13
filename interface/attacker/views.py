@@ -297,9 +297,10 @@ def update_email_tracking_log(request):
         log_entry = EmailTrackingLog.objects.filter(tracking_id=tracking_id, link_id=link_id).first()
 
         if log_entry:
+            ip_data = json.loads(log_entry.ip_data)
             # Initialize combined_ip_data with existing server data
             combined_ip_data = {
-                'server': json.loads(log_entry.ip_data.get('data', '{}')) if log_entry.ip_data else {},
+                'server': ip_data.get('data', {}) if ip_data else {},
                 'client': {},
                 'ip': {
                     'server': {
@@ -313,17 +314,19 @@ def update_email_tracking_log(request):
                 }
             }
 
-
             # Check IPv4 and IPv6 separately
             if log_entry.s_ipv4_address != ipv4 and ipv4:
                 new_ipv4_data = get_ip_data(ipv4)
                 combined_ip_data['client']['ipv4'] = new_ipv4_data
+            else :
+                combined_ip_data['client']['ipv4'] = ip_data.get('server', {}).get('ipv4', {})
 
             if log_entry.s_ipv6_address != ipv6 and ipv6:
                 new_ipv6_data = get_ip_data(None, ipv6)
                 combined_ip_data['client']['ipv6'] = new_ipv6_data
+            else :
+                combined_ip_data['client']['ipv6'] = ip_data.get('server', {}).get('ipv6', {})
 
-            
             # Update log entry with new data
             log_entry.c_ipv4_address = ipv4
             log_entry.c_ipv6_address = ipv6
@@ -362,17 +365,18 @@ def get_ip_data(ipv4, ipv6 = None):
     shodan_data_ipv6 = None
 
     if ipv4 and ( ipv4 != 'localhost' or ipv4 != '127.0.0.1' or ipv4 != '::1' ) :
-        try:
-            ipinfo_response = requests.get(f"https://ipinfo.io/{ipv4}/json?token=4115947f56b755")
-            ipinfo_data_ipv4 = ipinfo_response.json() if ipinfo_response.status_code == 200 else None
-        except Exception as e:
-            print(f"Error fetching IPinfo data for IPv4: {str(e)}")
-
+       
         try:
             ip_api_response = requests.get(f"http://ip-api.com/json/{ipv4}")
             ip_api_data_ipv4 = ip_api_response.json() if ip_api_response.status_code == 200 else None
         except Exception as e:
             print(f"Error fetching IP-API data for IPv4: {str(e)}")
+            
+        try:
+            ipinfo_response = requests.get(f"https://ipinfo.io/{ipv4}/json?token=4115947f56b755")
+            ipinfo_data_ipv4 = ipinfo_response.json() if ipinfo_response.status_code == 200 else None
+        except Exception as e:
+            print(f"Error fetching IPinfo data for IPv4: {str(e)}")
 
         try:
             SHODAN_API_KEY = "YOUR_SHODAN_API_KEY"
@@ -390,28 +394,26 @@ def get_ip_data(ipv4, ipv6 = None):
 
     if isIpv4 and isIpv6:
         return {
-            'Shodan' : {
-                'ipv4': shodan_data_ipv4,
-                'ipv6': shodan_data_ipv6
+            'ipv4' : {
+                'Shodan': shodan_data_ipv4,
+                'IP-info' : ipinfo_data_ipv4,
+                'IP-API' : ip_api_data_ipv4
             },
-            'IPinfo' : {
-                'ipv4': ipinfo_data_ipv4,
-                'ipv6': ipinfo_data_ipv6
-            },
-            'IP-API' : {
-                'ipv4': ip_api_data_ipv4,
-                'ipv6': ip_api_data_ipv6,
-            }
+            'ipv6' : {
+                'Shodan': shodan_data_ipv6,
+                'IP-info' : ipinfo_data_ipv6,
+                'IP-API' : ip_api_data_ipv6
+            },          
         }
     elif isIpv4 and not isIpv6:
         return {
-            'IPinfo': ipinfo_data_ipv4,
+            'IP-info': ipinfo_data_ipv4,
             'IP-API': ip_api_data_ipv4,
             'Shodan': shodan_data_ipv4
         }
     elif not isIpv4 and isIpv6:
         return {
-            'IPinfo': ipinfo_data_ipv6,
+            'IP-info': ipinfo_data_ipv6,
             'IP-API': ip_api_data_ipv6,
             'Shodan': shodan_data_ipv6
         }
@@ -440,9 +442,22 @@ def track_link(request, tracking_id, link_id):
     client_ip, is_routable = get_client_ip(request)
     ipv4 = client_ip if ':' not in client_ip else None
     ipv6 = client_ip if ':' in client_ip else None
+    f = 0
 
-    ip_data = get_ip_data(ipv4, ipv6)
-    ip_data = json.dumps(ip_data)
+    if ipv4 and ipv6:
+        ip_data = get_ip_data(ipv4, ipv6)
+    elif ipv4:
+        f=1
+        ip_data = get_ip_data(ipv4)
+    elif ipv6:
+        f=2
+        ip_data = get_ip_data(None, ipv6)
+    
+    if f == 1:
+        ip_data = {'ipv4': ip_data}
+    elif f == 2:
+        ip_data = {'ipv6': ip_data}
+
     ip_data = {
         'data': ip_data,
         'server': ip_data,
@@ -451,6 +466,8 @@ def track_link(request, tracking_id, link_id):
             'ipv6': ipv6
         }
     }
+    
+    ip_data_str = json.dumps(ip_data)
     # Log link click
     EmailTrackingLog.objects.create(
         campaign=link_tracking.campaign,
@@ -460,7 +477,7 @@ def track_link(request, tracking_id, link_id):
         action='link_click',
         s_ipv4_address=ipv4,
         s_ipv6_address=ipv6,
-        ip_data=ip_data,
+        ip_data=ip_data_str,
         user_agent=user_agent_string,
         device_info=device_info
     )

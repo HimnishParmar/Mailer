@@ -204,12 +204,9 @@
                                             </button>
                                         </h5>
                                         <div id="ip-info-content-{{ forloop.counter }}" class="toggle-content">
-                                            {% for key, value in link_data.ip_data.items %}
-                                            {% if key == 'ip' %}
-                                            {% else %}
-                                            {% include "json_recursive.html" with json_data=value %}
-                                            {% endif %}
-                                            {% endfor %}
+                                            
+                                            {% include "json_recursive.html" with json_data=link_data.ip_data.client %}
+                                            
                                         </div>
                                     </div>
                                     {% else %}
