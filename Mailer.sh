@@ -50,17 +50,49 @@ else
     fi
 fi
 
-# Step 2: Check if a valid virtual environment exists
-if [ -d ".venv" ] && [ -f ".venv/bin/activate" ]; then
-    echo "Valid virtual environment found."
-else
+
+# Create virtual environment if not found
+if [ ! -d ".venv" ]; then
     echo "Creating virtual environment..."
-    python3 -m venv .venv
+
+    # Check for ensurepip and install python3-venv if needed
+    if ! python3 -m venv .venv &> /dev/null; then
+        echo "Virtual environment creation failed. Missing python3-venv or ensurepip."
+        if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+            if ! dpkg -l | grep python3-venv &> /dev/null; then
+                echo "python3-venv is not installed. Installing now..."
+                sudo apt install -y python3-venv
+            fi
+        fi
+        echo "Retrying virtual environment creation..."
+        if ! python3 -m venv .venv; then
+            echo "Failed to create virtual environment after retry. Exiting."
+            exit 1
+        fi
+    else
+        echo "Virtual environment created successfully."
+    fi
+else
+    echo "Virtual environment already exists."
 fi
 
-# Step 3: Activate the virtual environment
+# Check if virtual environment was created by verifying the existence of the activation script
+if [ ! -f ".venv/bin/activate" ]; then
+    echo "Error: Virtual environment activation script not found. Exiting."
+    exit 1
+fi
+
+# Activate virtual environment
 echo "Activating virtual environment..."
 source .venv/bin/activate
+
+# Check if virtual environment is activated
+if [[ "$VIRTUAL_ENV" != "" ]]; then
+    echo "Virtual environment activated successfully."
+else
+    echo "Error: Failed to activate virtual environment. Exiting."
+    exit 1
+fi
 
 # Step 4: Check if Tkinter is available
 if python3 -c "import tkinter" &> /dev/null; then
