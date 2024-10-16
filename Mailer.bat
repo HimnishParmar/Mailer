@@ -1,8 +1,6 @@
 @echo off
 echo Current Directory: %cd%
 
-REM Step 0: Check if Python is installed
-
 REM Step 1: Check if Python is installed
 python --version >nul 2>&1
 IF %ERRORLEVEL% NEQ 0 (
@@ -37,7 +35,8 @@ IF %ERRORLEVEL% NEQ 0 (
         exit /b
     )
 ) ELSE (
-    python --version 2>nul | findstr /r "^Python [3-9]\.[1-9][1-9]*" >nul
+    REM Check if Python version is 3.11.* or higher
+    python --version 2>nul | findstr /r "^Python 3\.\(11\|[1-9][2-9]\)\.[0-9]+.*" >nul
     IF %ERRORLEVEL% NEQ 0 (
         echo Python 3.11 or higher is required. Current version is lower.
 
@@ -70,10 +69,9 @@ IF %ERRORLEVEL% NEQ 0 (
             exit /b
         )
     ) ELSE (
-        echo Python version is compatible.
+        echo Python version is 3.11 or higher.
     )
 )
-
 
 REM Step 2: Check for Tkinter availability
 python -c "import tkinter" >nul 2>&1
@@ -84,7 +82,6 @@ IF %ERRORLEVEL% NEQ 0 (
 ) ELSE (
     echo Tkinter is available.
 )
-
 
 REM Step 3: Check if virtual environment exists and activation script is present, if not, create/recreate it
 IF NOT EXIST ".venv\Scripts\activate" (
@@ -137,7 +134,7 @@ IF "%VIRTUAL_ENV%" == "" (
     echo Virtual environment activated successfully.
 )
 
-REM Step 3: Check if requirements.txt exists and install the dependencies
+REM Step 5: Check if requirements.txt exists and install the dependencies
 IF EXIST "requirements.txt" (
     echo Installing dependencies from requirements.txt...
     pip install -r requirements.txt
@@ -150,7 +147,7 @@ IF EXIST "requirements.txt" (
     echo requirements.txt not found. Skipping installation.
 )
 
-REM Step 4: Check if start_app.py exists and run the Tkinter application
+REM Step 6: Check if start_app.py exists and run the Tkinter application
 IF EXIST "start_app.py" (
     echo Running start_app.py...
     python start_app.py
