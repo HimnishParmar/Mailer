@@ -13,11 +13,11 @@ IF %ERRORLEVEL% NEQ 0 (
     IF "!install_python!"=="Y" (
         echo Downloading Python installer...
 
-        REM Download Python installer from the official site
-        powershell -Command "(New-Object System.Net.WebClient).DownloadFile('https://www.python.org/ftp/python/3.12.0/python-3.12.0-amd64.exe', 'python_installer.exe')"
-
-        echo Installing Python...
-        start /wait python_installer.exe /quiet InstallAllUsers=1 PrependPath=1 Include_test=0
+         REM Download Python installer using bitsadmin
+         bitsadmin /transfer "DownloadPython" https://www.python.org/ftp/python/3.12.0/python-3.12.0-amd64.exe %cd%\python_installer.exe
+    
+         echo Installing Python...
+         start /wait python_installer.exe /quiet InstallAllUsers=1 PrependPath=1 Include_test=0
 
         REM Clean up by removing the installer file
         del python_installer.exe
