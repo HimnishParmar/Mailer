@@ -26,13 +26,12 @@ To get started with the Mailer project, follow these instructions to download an
 
 - Python >3.11.x
 - Pip (Python package installer)
-- Git
 
 ### Installation
 
 1. **Clone the Repository**:
 
-   You can either download the project as a ZIP file from GitHub or clone the repository using the following command:
+   You can either download the project as a ZIP file from GitHub or clone the repository using the following command ( If you don't have Git installed : from https://git-scm.com/downloads you can install it ):
 
    ```bash
    git clone https://github.com/HimnishParmar/Mailer.git
