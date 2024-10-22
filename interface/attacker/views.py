@@ -143,6 +143,10 @@ def campaign_page(request, campaign_id):
     
     tracking_logs = EmailTrackingLog.objects.filter(campaign=campaign).order_by('recipient', '-timestamp')
     link_trackings = LinkTracking.objects.filter(campaign=campaign)
+
+    for link_tracking in link_trackings:
+        link_tracking.timestamp_ist = link_tracking.timestamp + timedelta(hours=5, minutes=30)
+    
     
     recipient_data = {}
     for log in tracking_logs:
