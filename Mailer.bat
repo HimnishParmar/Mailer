@@ -163,3 +163,6 @@ IF EXIST "start_app.py" (
     pause
     exit /b
 )
+
+
+pause
