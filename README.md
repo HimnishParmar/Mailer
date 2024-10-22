@@ -25,7 +25,8 @@ To get started with the Mailer project, follow these instructions to download an
 ### Prerequisites
 
 - Python >3.11.x
-- pip (Python package installer)
+- Pip (Python package installer)
+- Git
 
 ### Installation
 
