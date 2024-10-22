@@ -31,13 +31,14 @@ To get started with the Mailer project, follow these instructions to download an
 
 1. **Clone the Repository**:
 
-   You can either download the project as a ZIP file from GitHub or clone the repository using the following command ( If you don't have Git installed : from https://git-scm.com/downloads you can install it ):
+   You can either download the project as a ZIP file from GitHub or clone the repository using the following command
+   ( If you don't have Git installed : from https://git-scm.com/downloads you can install it ):
 
    ```bash
    git clone https://github.com/HimnishParmar/Mailer.git
    ```
 
-2. **Navigate to the Project Directory**:
+3. **Navigate to the Project Directory**:
 
    Change to the project directory:
 
@@ -45,7 +46,7 @@ To get started with the Mailer project, follow these instructions to download an
    cd Mailer
    ```
 
-3. **Run the Installer**:
+4. **Run the Installer**:
 
    For **Windows**, execute the `Mailer.bat` file to start the application.
 
