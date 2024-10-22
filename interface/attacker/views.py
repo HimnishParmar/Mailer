@@ -145,7 +145,7 @@ def campaign_page(request, campaign_id):
     link_trackings = LinkTracking.objects.filter(campaign=campaign)
 
     for link_tracking in link_trackings:
-        link_tracking.timestamp_ist = link_tracking.timestamp + timedelta(hours=5, minutes=30)
+        link_tracking.timestamp_ist = link_tracking.created_at + timedelta(hours=5, minutes=30)
     
     
     recipient_data = {}
