@@ -1,5 +1,7 @@
 @echo off
 echo Current Directory: %cd%
+setlocal enabledelayedexpansion
+
 
 REM Step 1: Check if Python is installed
 python --version >nul 2>&1
@@ -8,7 +10,7 @@ IF %ERRORLEVEL% NEQ 0 (
 
     REM Ask the user for confirmation to download and install Python
     set /p install_python="Python is not installed. Do you want to download and install Python 3.12? (Y/N): "
-    IF /I "%install_python%"=="Y" (
+    IF "!install_python!"=="Y" (
         echo Downloading Python installer...
 
         REM Download Python installer from the official site
