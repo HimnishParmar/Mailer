@@ -25,6 +25,7 @@ root = None
 error_window = None
 smtp_host_var = None
 smtp_port_var = None
+url_to_open = None
 
 # Get the current directory where the executable is running
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -96,7 +97,7 @@ def update_loader(target, speed, update_title_func):
         time.sleep(0.01)
 
 def start_django(host, port, start_button, filling_button, open_button, close_button, port_entry, host_buttons, smtp_host_entry, smtp_port_entry):
-    global server_process
+    global server_process, url_to_open
     
     print(f"[DEBUG] Starting Django server on {host}:{port}")
 
@@ -417,7 +418,7 @@ def open_settings_window():
     api_frame.grid_columnconfigure(0, weight=1)
 
 def get_host_and_port():
-    global server_process, root, smtp_host_var, smtp_port_var
+    global server_process, root, smtp_host_var, smtp_port_var, url_to_open
     env_host = db.get_value('LAN_IP', '127.0.0.1')
     env_port = db.get_value('PORT', '8000')
     env_smtp_host = db.get_value('SMTP_HOST', 'localhost')
@@ -516,7 +517,7 @@ def get_host_and_port():
 
     start_button.configure(command=on_submit)
     filling_button.configure(state=ctk.DISABLED)
-    open_button.configure(command=lambda: webbrowser.open(f"http://{host_var.get()}:{port_var.get()}"))
+    open_button.configure(command=lambda: webbrowser.open(f"{url_to_open}"))
     close_button.configure(command=lambda: stop_django(host_var.get(), port_var.get(), start_button, filling_button, open_button, close_button, port_entry, [localhost_btn, lan_ip_btn, ngrok_btn], smtp_host_entry, smtp_port_entry))
 
     root.grid_columnconfigure(0, weight=1)
